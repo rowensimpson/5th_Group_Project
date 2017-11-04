@@ -1,3 +1,5 @@
+# code used to test the GUI by flooding in data
+
 import random
 from time import sleep
 
