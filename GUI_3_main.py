@@ -1,16 +1,14 @@
 from __future__ import print_function
 import matplotlib
-
-matplotlib.use("TkAgg")
-
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import matplotlib.animation as animation
-
 import tkinter as tk
 
 # Declarations
+matplotlib.use("TkAgg")
 DIM_Y = [0, 50]
+LARGE_FONT = ("Verdana", 12)
 
 # unit 1 / V and I
 a = Figure()
@@ -52,49 +50,70 @@ plot_b.set_ylim([0, 50])
 lnb, = plot_b.plot([], [], color='olive', lw=2)
 
 
+def print_var(ts, dv_1, dc_1, bv_1, bc_1, dv_2, dc_2, bv_2, bc_2, dv_3, dc_3, bv_3, bc_3):
+
+    var_list = [ts, dv_1, dc_1, bv_1, bc_1, dv_2, dc_2, bv_2, bc_2, dv_3, dc_3, bv_3, bc_3]
+
+    for elements in var_list:
+        print(elements)
+
 def updateGraphsA(i):
-    pullData = open('sampleText2.txt', 'r').read()
+    pullData = open('sampleText.txt', 'r').read()
     dataArray = pullData.split('\n')
-    xar = []
-    yar = []
+    time_stamp = []
+    dist_voltage = []
+    dist_current = []
+    batt_voltage = []
+    batt_current = []
     for eachLine in dataArray:
         if len(eachLine) > 1:
-            x, y = eachLine.split(',')
-            xar.append(int(x))
-            yar.append(int(y))
-
-    lna_0.set_xdata(xar)
-    lna_0.set_ydata(yar)
-    lna_1.set_xdata(xar)
-    lna_1.set_ydata(yar)
-    lna_2.set_xdata(xar)
-    lna_2.set_ydata(yar)
-    lna_3.set_xdata(xar)
-    lna_3.set_ydata(yar)
-    DIM_X = [max(xar)-50, max(xar)+10]
+            ts, dv_1, dc_1, bv_1, bc_1,\
+            dv_2, dc_2, bv_2, bc_2,\
+            dv_3, dc_3, bv_3, bc_3 = eachLine.split(',')
+            time_stamp.append(int(ts))
+            dist_voltage.append(int(dv_1))
+            dist_current.append(int(dc_1))
+            batt_voltage.append(int(bv_1))
+            batt_current.append(int(bc_1))
+    lna_0.set_xdata(time_stamp)
+    lna_0.set_ydata(dist_voltage)
+    lna_1.set_xdata(time_stamp)
+    lna_1.set_ydata(dist_current)
+    lna_2.set_xdata(time_stamp)
+    lna_2.set_ydata(batt_voltage)
+    lna_3.set_xdata(time_stamp)
+    lna_3.set_ydata(batt_current)
+    DIM_X = [max(time_stamp)-50, max(time_stamp)+10]
     plot_a_0.set_xlim(DIM_X)
     plot_a_1.set_xlim(DIM_X)
     plot_a_2.set_xlim(DIM_X)
     plot_a_3.set_xlim(DIM_X)
 
-    print('in A')
+    print('XXXXXXXXXOOOOOOOOOOOXXXXXXXXXX')
+    print(ts, dv_1, dc_1, bv_1, bc_1, dv_2, dc_2, bv_2, bc_2, dv_3, dc_3, bv_3, bc_3)
 
 
 def updateGraphsB(i):
     pullData = open('sampleText.txt', 'r').read()
     dataArray = pullData.split('\n')
-    xar = []
-    yar = []
+    time_stamp = []
+    dist_voltage = []
+    dist_current = []
+    batt_voltage = []
+    batt_current = []
     for eachLine in dataArray:
         if len(eachLine) > 1:
-            x, y = eachLine.split(',')
-            xar.append(int(x))
-            yar.append(int(y))
+            ts, dv_1, dc_1, bv_1, bc_1,\
+            dv_2, dc_2, bv_2, bc_2,\
+            dv_3, dc_3, bv_3, bc_3 = eachLine.split(',')
+            time_stamp.append(int(ts))
+            dist_voltage.append(int(dv_2))
+            dist_current.append(int(dc_2))
+            batt_voltage.append(int(bv_2))
+            batt_current.append(int(bc_2))
 
-    lnb.set_xdata(xar)
-    lnb.set_ydata(yar)
-    print('in B')
-
+    lnb.set_xdata(dist_voltage)
+    lnb.set_ydata(dist_current)
 
 
 class TransientAnalysis(tk.Tk):
@@ -133,16 +152,15 @@ class GraphPageA(tk.Frame):
     def __init__(self, parent, controller):
 
         tk.Frame.__init__(self, parent)
-
+        label = tk.Label(self, text="Unit 1", font=LARGE_FONT).pack(side=tk.TOP)
         button1 = tk.Button(self, text="Show Graph B", command=(lambda: controller.show_frame(GraphPageB)))
-        # button1.grid(row=1, column=0, pady=20, padx=10, sticky='w')
-        button1.pack(side=tk.LEFT)
+        button1.pack(side=tk.TOP)
 
         canvasA = FigureCanvasTkAgg(a, self)
         canvasA.show()
-        #canvasA.get_tk_widget().grid(row=1, column=1, pady=0, padx=0, sticky='nsew')
         canvasA.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         self.canvas = canvasA
+
 
 
 class GraphPageB(tk.Frame):
