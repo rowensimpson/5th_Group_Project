@@ -4,6 +4,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import matplotlib.animation as animation
 import tkinter as tk
+from tkinter import messagebox
 from matplotlib import style
 
 # Declarations
@@ -11,9 +12,19 @@ matplotlib.use("TkAgg")
 DIM_Y = [0, 50]
 LARGE_FONT = ("Verdana", 12)
 style.use('ggplot')
+RANGE = 70
+WIDTH = 20
+OFFSET = 20
+
+# unit states
+Unit1_State=False
+Unit2_State=False
+Unit3_State=False
+
+
 
 # unit 1 / V and I
-a = Figure()
+a = Figure(figsize=(10, 5), dpi=100)
 plot_a_0 = a.add_subplot(221)
 plot_a_1 = a.add_subplot(222)
 plot_a_2 = a.add_subplot(223)
@@ -44,7 +55,7 @@ lna_1, = plot_a_1.plot([], [], color='blue', lw=2)
 lna_2, = plot_a_2.plot([], [], color='red', lw=2)
 lna_3, = plot_a_3.plot([], [], color='blue', lw=2)
 # unit 2 / V and I plots
-b = Figure()
+b = Figure(figsize=(10, 5), dpi=100)
 plot_b_0 = b.add_subplot(221)
 plot_b_1 = b.add_subplot(222)
 plot_b_2 = b.add_subplot(223)
@@ -75,7 +86,7 @@ lnb_1, = plot_b_1.plot([], [], color='blue', lw=2)
 lnb_2, = plot_b_2.plot([], [], color='red', lw=2)
 lnb_3, = plot_b_3.plot([], [], color='blue', lw=2)
 # unit 3 / V and I plots
-c = Figure()
+c = Figure(figsize=(10, 5), dpi=100)
 plot_c_0 = c.add_subplot(221)
 plot_c_1 = c.add_subplot(222)
 plot_c_2 = c.add_subplot(223)
@@ -107,16 +118,8 @@ lnc_2, = plot_c_2.plot([], [], color='red', lw=2)
 lnc_3, = plot_c_3.plot([], [], color='blue', lw=2)
 
 
-def print_var(ts, dv_1, dc_1, bv_1, bc_1, dv_2, dc_2, bv_2, bc_2, dv_3, dc_3, bv_3, bc_3):
-
-    var_list = [ts, dv_1, dc_1, bv_1, bc_1, dv_2, dc_2, bv_2, bc_2, dv_3, dc_3, bv_3, bc_3]
-
-    for elements in var_list:
-        print(elements)
-
-
 def updateGraphsA(i):
-    pullData = open('sampleText.txt', 'r').read()
+    pullData = open('sampleText2.txt', 'r').read()
     dataArray = pullData.split('\n')
     time_stamp = []
     dist_voltage = []
@@ -141,7 +144,7 @@ def updateGraphsA(i):
     lna_2.set_ydata(batt_voltage)
     lna_3.set_xdata(time_stamp)
     lna_3.set_ydata(batt_current)
-    DIM_X = [max(time_stamp)-50, max(time_stamp)+10]
+    DIM_X = [max(time_stamp)-RANGE, max(time_stamp)+10]
     plot_a_0.set_xlim(DIM_X)
     plot_a_1.set_xlim(DIM_X)
     plot_a_2.set_xlim(DIM_X)
@@ -150,7 +153,7 @@ def updateGraphsA(i):
 
 
 def updateGraphsB(i):
-    pullData = open('sampleText.txt', 'r').read()
+    pullData = open('sampleText2.txt', 'r').read()
     dataArray = pullData.split('\n')
     time_stamp = []
     dist_voltage = []
@@ -175,7 +178,7 @@ def updateGraphsB(i):
     lnb_2.set_ydata(batt_voltage)
     lnb_3.set_xdata(time_stamp)
     lnb_3.set_ydata(batt_current)
-    DIM_X = [max(time_stamp)-50, max(time_stamp)+10]
+    DIM_X = [max(time_stamp)-RANGE, max(time_stamp)+10]
     plot_b_0.set_xlim(DIM_X)
     plot_b_1.set_xlim(DIM_X)
     plot_b_2.set_xlim(DIM_X)
@@ -184,7 +187,7 @@ def updateGraphsB(i):
 
 
 def updateGraphsC(i):
-    pullData = open('sampleText.txt', 'r').read()
+    pullData = open('sampleText2.txt', 'r').read()
     dataArray = pullData.split('\n')
     time_stamp = []
     dist_voltage = []
@@ -209,12 +212,41 @@ def updateGraphsC(i):
     lnc_2.set_ydata(batt_voltage)
     lnc_3.set_xdata(time_stamp)
     lnc_3.set_ydata(batt_current)
-    DIM_X = [max(time_stamp)-50, max(time_stamp)+10]
+    DIM_X = [max(time_stamp)-RANGE, max(time_stamp)+10]
     plot_c_0.set_xlim(DIM_X)
     plot_c_1.set_xlim(DIM_X)
     plot_c_2.set_xlim(DIM_X)
     plot_c_3.set_xlim(DIM_X)
     print('C')
+
+def helloCallBack():
+    msg = tk.messagebox.showinfo("State Action", "Are you sure? \n woooow")
+
+def state_control_function(B1_marker, B2_marker, B3_marker, B4_marker, B5_marker, B6_marker):
+    if B1_marker== True:
+        print("unit 1 importing")
+        Unit1_State = True
+    if B2_marker == True:
+        print("unit 1 Exporting")
+        Unit1_State = False
+    if B3_marker == True:
+        print("unit 2 importing")
+        Unit2_State = True
+    if B4_marker == True:
+        print("unit 2 Exporting")
+        Unit2_State = False
+    if B5_marker == True:
+        print("unit 3 importing")
+        Unit3_State = True
+    if B6_marker == True:
+        print("unit 3 Exporting")
+        Unit3_State = False
+
+
+#  asks teh hubs for current hub status, waits for reply and updates UnitX_State
+def Unit_State_Config():
+    # need some serial fuctionality
+    print("Config the states")
 
 
 class TransientAnalysis(tk.Tk):
@@ -231,7 +263,7 @@ class TransientAnalysis(tk.Tk):
 
         self.frames = {}
 
-        for F in (GraphPageA, GraphPageB, GraphPageC):
+        for F in (GraphPageA, GraphPageB, GraphPageC, State_Handler):
 
             frame = F(container, self)
 
@@ -239,13 +271,14 @@ class TransientAnalysis(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(GraphPageA)
+        self.show_frame(State_Handler)
 
     def show_frame(self, cont):
 
         frame = self.frames[cont]
         frame.tkraise()
-        frame.canvas.draw_idle()
+        if cont != State_Handler:
+            frame.canvas.draw_idle()
 
 
 class GraphPageA(tk.Frame):
@@ -253,17 +286,18 @@ class GraphPageA(tk.Frame):
     def __init__(self, parent, controller):
 
         tk.Frame.__init__(self, parent)
-
         button1 = tk.Button(self, text="Go to Unit 1", bd=2, bg='green')
-        button1.pack(side=tk.TOP)
-        button2 = tk.Button(self, text="Go to Unit 2", command=(lambda: controller.show_frame(GraphPageB)))
-        button2.pack(side=tk.TOP)
-        button3 = tk.Button(self, text="Go to Unit 3", command=(lambda: controller.show_frame(GraphPageC)))
-        button3.pack(side=tk.TOP)
+        button1.grid(row=0, column=0, sticky='nsew', padx=5, pady=5)
+        button2 = tk.Button(self, text="Go to Unit 2", width=WIDTH, command=(lambda: controller.show_frame(GraphPageB)))
+        button2.grid(row=1, column=0, sticky='nsew', padx=5, pady=5)
+        button3 = tk.Button(self, text="Go to Unit 3", width=WIDTH, command=(lambda: controller.show_frame(GraphPageC)))
+        button3.grid(row=0, column=1, sticky='nsew', padx=5, pady=5)
+        button4 = tk.Button(self, text="State Control", width=WIDTH, command=(lambda: controller.show_frame(State_Handler)))
+        button4.grid(row=1, column=1, sticky='nsew', padx=5, pady=5)
 
         canvasA = FigureCanvasTkAgg(a, self)
         canvasA.show()
-        canvasA.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        canvasA.get_tk_widget().grid(row=2, column=0, columnspan=4)
         self.canvas = canvasA
 
 
@@ -273,16 +307,18 @@ class GraphPageB(tk.Frame):
 
         tk.Frame.__init__(self, parent)
 
-        button1 = tk.Button(self, text="Go to Unit 1", command=(lambda: controller.show_frame(GraphPageA)))
-        button1.pack(side=tk.TOP)
-        button2 = tk.Button(self, text="Go to Unit 2", bd=2, bg='green')
-        button2.pack(side=tk.TOP)
-        button3 = tk.Button(self, text="Go to Unit 3", command=(lambda: controller.show_frame(GraphPageC)))
-        button3.pack(side=tk.TOP)
+        button1 = tk.Button(self, text="Go to Unit 1", width=WIDTH, command=(lambda: controller.show_frame(GraphPageA)))
+        button1.grid(row=0, column=0, sticky='nsew', padx=5, pady=5)
+        button2 = tk.Button(self, text="Go to Unit 2", width=WIDTH, bd=2, bg='green')
+        button2.grid(row=1, column=0, sticky='nsew', padx=5, pady=5)
+        button3 = tk.Button(self, text="Go to Unit 3", width=WIDTH, command=(lambda: controller.show_frame(GraphPageC)))
+        button3.grid(row=0, column=1, sticky='nsew', padx=5, pady=5)
+        button4 = tk.Button(self, text="State Control", width=WIDTH, command=(lambda: controller.show_frame(State_Handler)))
+        button4.grid(row=1, column=1, sticky='nsew', padx=5, pady=5)
 
         canvasB = FigureCanvasTkAgg(b, self)
         canvasB.show()
-        canvasB.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        canvasB.get_tk_widget().grid(row=2, column=0, columnspan=4)
         self.canvas = canvasB
 
 class GraphPageC(tk.Frame):
@@ -290,21 +326,81 @@ class GraphPageC(tk.Frame):
     def __init__(self, parent, controller):
 
         tk.Frame.__init__(self, parent)
-        button1 = tk.Button(self, text="Go to Unit 1", command=(lambda: controller.show_frame(GraphPageA)))
-        button1.pack(side=tk.TOP)
-        button2 = tk.Button(self, text="Go to Unit 2", command=(lambda: controller.show_frame(GraphPageB)))
-        button2.pack(side=tk.TOP)
-        button3 = tk.Button(self, text="Go to Unit 3", bd=2, bg='green')
-        button3.pack(side=tk.TOP)
+        button1 = tk.Button(self, text="Go to Unit 1", width=WIDTH, command=(lambda: controller.show_frame(GraphPageA)))
+        button1.grid(row=0, column=0, sticky='nsew', padx=5, pady=5)
+        button2 = tk.Button(self, text="Go to Unit 2", width=WIDTH, command=(lambda: controller.show_frame(GraphPageB)))
+        button2.grid(row=1, column=0, sticky='nsew', padx=5, pady=5)
+        button3 = tk.Button(self, text="Go to Unit 3", width=WIDTH, bd=2, bg='green')
+        button3.grid(row=0, column=1, sticky='nsew', padx=5, pady=5)
+        button4 = tk.Button(self, text="State Control", width=WIDTH, command=(lambda: controller.show_frame(State_Handler)))
+        button4.grid(row=1, column=1, sticky='nsew', padx=5, pady=5)
         canvasC = FigureCanvasTkAgg(c, self)
         canvasC.show()
-        canvasC.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        canvasC.get_tk_widget().grid(row=2, column=0, columnspan=4)
         self.canvas = canvasC
 
+class State_Handler(tk.Frame):
 
+    def __init__(self, parent, controller):
+
+        tk.Frame.__init__(self, parent)
+
+        button = tk.Button(self, text="Go to Unit 1", width=WIDTH+OFFSET
+                            , command=lambda: controller.show_frame(GraphPageA))
+        button.grid(row=0, column=0, sticky='nsew', padx=5, pady=5)
+
+        button2 = tk.Button(self, text="Go to Unit 2", width=WIDTH+OFFSET
+                            , command=lambda: controller.show_frame(GraphPageB))
+        button2.grid(row=1, column=0, sticky='nsew', padx=5, pady=5)
+
+        button3 = tk.Button(self, text="Go to Unit 3", width=WIDTH+OFFSET
+                            , command=lambda: controller.show_frame(GraphPageC))
+        button3.grid(row=0, column=1, sticky='nsew', padx=5, pady=5)
+
+        button4 = tk.Button(self, text="State Control", bd=2, bg='green', width=WIDTH+OFFSET)
+        button4.grid(row=1, column=1, sticky='nsew', padx=5, pady=5)
+
+        # state selection buttons
+        #Unit 1 state
+        button5 = tk.Button(self, text="Import",
+                            command=lambda: state_control_function(B1_marker=True, B2_marker=False, B3_marker=False,
+                                    B4_marker=False, B5_marker=False, B6_marker=False))
+        button5.grid(row=4, column=2, sticky='nsew', padx=5, pady=5)
+        button6 = tk.Button(self, text="Export",
+                            command=lambda: state_control_function(B1_marker=False, B2_marker=True, B3_marker=False,
+                                    B4_marker=False, B5_marker=False, B6_marker=False))
+        button6.grid(row=4, column=3, sticky='nsew', padx=5, pady=5)
+
+        #Unit 2 state
+        button7 = tk.Button(self, text="Import",
+                            command=lambda: state_control_function(B1_marker=False, B2_marker=False, B3_marker=True,
+                                    B4_marker=False, B5_marker=False, B6_marker=False))
+        button7.grid(row=5, column=2, sticky='nsew', padx=5, pady=5)
+        button8 = tk.Button(self, text="Export",
+                            command=lambda: state_control_function(B1_marker=False, B2_marker=False, B3_marker=False,
+                                    B4_marker=True, B5_marker=False, B6_marker=False))
+        button8.grid(row=5, column=3, sticky='nsew', padx=5, pady=5)
+
+        # Unit 3 state
+        button9 = tk.Button(self, text="Import",
+                            command=lambda: state_control_function(B1_marker=False, B2_marker=False, B3_marker=False
+                                    ,B4_marker=False, B5_marker=True, B6_marker=False))
+        button9.grid(row=6, column=2, sticky='nsew', padx=5, pady=5)
+        button10 = tk.Button(self, text="Export",
+                             command=lambda: state_control_function(B1_marker=False, B2_marker=False, B3_marker=False,
+                                    B4_marker=False, B5_marker=False, B6_marker=True))
+        button10.grid(row=6, column=3, sticky='nsew', padx=5, pady=5)
+
+        # state execution button
+        button9 = tk.Button(self, text="Confirm State Change", command=lambda: helloCallBack())
+        button9.grid(row=3, column=0, sticky='nsew', padx=80, pady=80, columnspan=2, rowspan=4)
+
+
+
+Unit_State_Config()
 app = TransientAnalysis()
-app.geometry("800x600")
-aniA = animation.FuncAnimation(a, updateGraphsA, interval=1000, blit=False)
-aniB = animation.FuncAnimation(b, updateGraphsB, interval=1000, blit=False)
-aniC = animation.FuncAnimation(c, updateGraphsC, interval=1000, blit=False)
+app.geometry("1000x600")
+aniA = animation.FuncAnimation(a, updateGraphsA, interval=500, blit=False)
+aniB = animation.FuncAnimation(b, updateGraphsB, interval=500, blit=False)
+aniC = animation.FuncAnimation(c, updateGraphsC, interval=500, blit=False)
 app.mainloop()
