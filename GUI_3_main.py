@@ -1,11 +1,13 @@
 from __future__ import print_function
-import matplotlib
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-import matplotlib.animation as animation
+
 import tkinter as tk
 from tkinter import messagebox
+
+import matplotlib
+import matplotlib.animation as animation
 from matplotlib import style
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 # Declarations
 matplotlib.use("TkAgg")
@@ -16,12 +18,10 @@ RANGE = 70
 WIDTH = 20
 OFFSET = 20
 
-# unit states
-Unit1_State=False
-Unit2_State=False
-Unit3_State=False
-
-
+# unit states init, True = Importing False = Exporting
+Unit1_State = False
+Unit2_State = False
+Unit3_State = False
 
 # unit 1 / V and I
 a = Figure(figsize=(10, 5), dpi=100)
@@ -136,6 +136,7 @@ def updateGraphsA(i):
             dist_current.append(int(dc_1))
             batt_voltage.append(int(bv_1))
             batt_current.append(int(bc_1))
+
     lna_0.set_xdata(time_stamp)
     lna_0.set_ydata(dist_voltage)
     lna_1.set_xdata(time_stamp)
@@ -219,34 +220,50 @@ def updateGraphsC(i):
     plot_c_3.set_xlim(DIM_X)
     print('C')
 
-def helloCallBack():
+
+def state_exe():
     msg = tk.messagebox.showinfo("State Action", "Are you sure? \n woooow")
 
+
 def state_control_function(B1_marker, B2_marker, B3_marker, B4_marker, B5_marker, B6_marker):
-    if B1_marker== True:
-        print("unit 1 importing")
+
+    global Unit1_State
+    global Unit2_State
+    global Unit3_State
+
+    if B1_marker:
         Unit1_State = True
-    if B2_marker == True:
-        print("unit 1 Exporting")
+    if B2_marker:
         Unit1_State = False
-    if B3_marker == True:
-        print("unit 2 importing")
+    if B3_marker:
         Unit2_State = True
-    if B4_marker == True:
-        print("unit 2 Exporting")
+    if B4_marker:
         Unit2_State = False
-    if B5_marker == True:
-        print("unit 3 importing")
+    if B5_marker:
         Unit3_State = True
-    if B6_marker == True:
-        print("unit 3 Exporting")
+    if B6_marker:
         Unit3_State = False
 
+    if Unit1_State:
+        print("unit 1 Importing")
+    else:
+        print("unit 1 Exporting")
+    if Unit2_State:
+        print("unit 2 Importing")
+    else:
+        print("unit 2 Exporting")
+    if Unit3_State:
+        print("unit 3 Importing")
+    else:
+        print("unit 3 Exporting")
 
-#  asks teh hubs for current hub status, waits for reply and updates UnitX_State
+
+#  asks the hubs for current hub status, waits for reply and updates UnitX_State
 def Unit_State_Config():
     # need some serial fuctionality
-    print("Config the states")
+    print("run the PySerial script")
+    completed = subprocess.run(["python", "GUI_Header.py"])
+    print('returncode:', completed.returncode)
 
 
 class TransientAnalysis(tk.Tk):
@@ -263,7 +280,7 @@ class TransientAnalysis(tk.Tk):
 
         self.frames = {}
 
-        for F in (GraphPageA, GraphPageB, GraphPageC, State_Handler):
+        for F in (State_Handler, GraphPageA, GraphPageB, GraphPageC):
 
             frame = F(container, self)
 
@@ -321,6 +338,7 @@ class GraphPageB(tk.Frame):
         canvasB.get_tk_widget().grid(row=2, column=0, columnspan=4)
         self.canvas = canvasB
 
+
 class GraphPageC(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -338,6 +356,7 @@ class GraphPageC(tk.Frame):
         canvasC.show()
         canvasC.get_tk_widget().grid(row=2, column=0, columnspan=4)
         self.canvas = canvasC
+
 
 class State_Handler(tk.Frame):
 
@@ -361,7 +380,7 @@ class State_Handler(tk.Frame):
         button4.grid(row=1, column=1, sticky='nsew', padx=5, pady=5)
 
         # state selection buttons
-        #Unit 1 state
+        # Unit 1 state
         button5 = tk.Button(self, text="Import",
                             command=lambda: state_control_function(B1_marker=True, B2_marker=False, B3_marker=False,
                                     B4_marker=False, B5_marker=False, B6_marker=False))
@@ -371,7 +390,7 @@ class State_Handler(tk.Frame):
                                     B4_marker=False, B5_marker=False, B6_marker=False))
         button6.grid(row=4, column=3, sticky='nsew', padx=5, pady=5)
 
-        #Unit 2 state
+        # Unit 2 state
         button7 = tk.Button(self, text="Import",
                             command=lambda: state_control_function(B1_marker=False, B2_marker=False, B3_marker=True,
                                     B4_marker=False, B5_marker=False, B6_marker=False))
@@ -392,9 +411,8 @@ class State_Handler(tk.Frame):
         button10.grid(row=6, column=3, sticky='nsew', padx=5, pady=5)
 
         # state execution button
-        button9 = tk.Button(self, text="Confirm State Change", command=lambda: helloCallBack())
+        button9 = tk.Button(self, text="Confirm State Change", command=lambda: state_exe())
         button9.grid(row=3, column=0, sticky='nsew', padx=80, pady=80, columnspan=2, rowspan=4)
-
 
 
 Unit_State_Config()
